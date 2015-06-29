@@ -1,9 +1,15 @@
-// Setup basic express server
+var url = require('url');
 var express = require('express');
+var group = require('./lib/group');
+
+// Setup basic express server
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
+
+//!todo: add this once determined.
+var hostUrl = '';
 
 server.listen(port, function () {
     console.log('Server listening at port %d', port);
@@ -12,68 +18,103 @@ server.listen(port, function () {
 // Routing
 app.use(express.static(__dirname + '/public'));
 
-// Chatroom
+var userRoutes = {};
+var adminRoutes = {};
 
-// usernames which are currently connected to the chat
-var usernames = {};
-var numUsers = 0;
+var groups = {};
+var currentOrders = {};
 
-io.on('connection', function (socket) {
-    var addedUser = false;
+io.on('connection', function (rootSocket) {
+    rootSocket.on('New Group', function (name) {
+        //Worth noting this will mess up if two groups are present with the same name.
+        var newGroup = group.createGroup(name);
+        groups[name] = newGroup;
 
-    // when the client emits 'new message', this listens and executes
-    socket.on('new message', function (data) {
-        // we tell the client to execute 'new message'
-        socket.broadcast.emit('new message', {
-            username: socket.username,
-            message: data
+        userRoutes[name] = '^\\/' + newGroup.userUrl + '\\/(\\d+)$';
+        //Admins should also have all user functionality
+        userRoutes[newGroup.adminUrl] = '^\\/' + newGroup.adminUrl + '\\/(\\d+)$';
+        adminRoutes[newGroup.adminUrl] = '^\\/' + newGroup.userUrl + '\\/(\\d+)$';
+
+        rootSocket.emit('Group Links', {
+            userUrl:    hostUrl + newGroup.userUrl,
+            adminUrl:   hostUrl + newGroup.adminUrl
         });
     });
 
-    // when the client emits 'add user', this listens and executes
-    socket.on('add user', function (username) {
-        // we store the username in the socket session for this client
-        socket.username = username;
-        // add the client's username to the global list
-        usernames[username] = username;
-        ++numUsers;
-        addedUser = true;
-        socket.emit('login', {
-            numUsers: numUsers
-        });
-        // echo globally (all clients) that a person has connected
-        socket.broadcast.emit('user joined', {
-            username: socket.username,
-            numUsers: numUsers
-        });
-    });
+    var ns = url.parse(rootSocketS.handshake.url, true).query.ns;
 
-    // when the client emits 'typing', we broadcast it to others
-    socket.on('typing', function () {
-        socket.broadcast.emit('typing', {
-            username: socket.username
-        });
-    });
+    for (var userKey in userRoutes) {
+        var userRouteName = userKey;
+        var userRouteRegexp = new Regexp(userRoutes[userKey]);
 
-    // when the client emits 'stop typing', we broadcast it to others
-    socket.on('stop typing', function () {
-        socket.broadcast.emit('stop typing', {
-            username: socket.username
-        });
-    });
+        //!todo: deal with admin string in url
+        var currentGroup = groups[userKey];
 
-    // when the user disconnects.. perform this
-    socket.on('disconnect', function () {
-        // remove the username from global usernames list
-        if (addedUser) {
-            delete usernames[socket.username];
-            --numUsers;
+        if (ns.match(userRouteRegexp)) {
+            io.of(ns).on('connection', function (socket) {
+               socket.on('New User', function (name) {
+                   socket.userName = name;
+                   currentGroup.addUser(name);
 
-            // echo globally that this client has left
-            socket.broadcast.emit('user left', {
-                username: socket.username,
-                numUsers: numUsers
+                   socket.emit('Current Order', currentGroup.currentOrder);
+               });
+
+                //!todo: Determine if we need this event anymore
+                socket.on('User Voting', function (user) {
+                    if (currentOrder.locked) {
+                        socket.emit('Lock Order', {
+                           'lockOrder': true
+                        });
+                    } else {
+                        currentGroup.userVoting(user);
+                        socket.emit('Current Order', currentGroup.currentOrder);
+                    }
+                });
+
+                socket.on('New Vote', function (newVote) {
+                    if (currentOrder.locked) {
+                        socket.emit('Lock Order', {
+                            'lockOrder': true
+                        });
+                    } else {
+                        socket.emit('Current Order', currentGroup.currentOrder);
+                        currentGroup.acceptNewVote(newVote);
+                    }
+                });
+
+                socket.on('disconnect', function () {
+                    currentGroup.userLeft(socket.username);
+
+                    socket.emit('Current Order', currentGroup.currentOrder);
+                });
             });
         }
-    });
+    }
+
+    for (var adminKey in adminRoutes) {
+        var adminName = adminKey;
+        var adminRouteRegexp = new Regexp(adminRoutes[adminKey]);
+
+        if (ns.match(adminRouteRegexp)) {
+            io.of(ns).on('connection', function (socket) {
+                //!todo: deal with admin string in url
+                var currentGroup = groups[adminKey];
+
+                socket.on('Order Finalized', function () {
+                    currentGroup.lockOrder();
+                });
+
+                socket.on('Edit Order', function (newOrder) {
+                   if (currentGroup.locked) {
+                       socket.emit('Lock Order', {
+                           'lockOrder': true
+                       });
+                   } else {
+                       currentGroup.editOrder(newOrder);
+                       socket.emit('currentOrder', currentGroup.currentOrder);
+                   }
+                });
+            });
+        }
+    }
 });
