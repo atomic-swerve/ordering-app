@@ -8,9 +8,6 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
-//!todo: add this once determined.
-var hostUrl = '';
-
 server.listen(port, function () {
     console.log('Server listening at port %d', port);
 });
@@ -36,8 +33,8 @@ io.on('connection', function (rootSocket) {
         adminRoutes[newGroup.adminUrl] = '^\\/' + newGroup.userUrl + '\\/(\\d+)$';
 
         rootSocket.emit('Group Links', {
-            userUrl:    hostUrl + newGroup.userUrl,
-            adminUrl:   hostUrl + newGroup.adminUrl
+            userUrl:    config.hostUrl + newGroup.userUrl,
+            adminUrl:   config.hostUrl + newGroup.adminUrl
         });
     });
 
@@ -56,7 +53,7 @@ io.on('connection', function (rootSocket) {
                    socket.userName = name;
                    currentGroup.addUser(name);
 
-                   socket.emit('Current Order', currentGroup.currentOrder);
+                   socket.emit('Current Order', currentGroup.getCurrentOrder());
                });
 
                 //!todo: Determine if we need this event anymore
@@ -67,7 +64,7 @@ io.on('connection', function (rootSocket) {
                         });
                     } else {
                         currentGroup.userVoting(user);
-                        socket.emit('Current Order', currentGroup.currentOrder);
+                        socket.emit('Current Order', currentGroup.getCurrentOrder());
                     }
                 });
 
@@ -77,7 +74,7 @@ io.on('connection', function (rootSocket) {
                             'lockOrder': true
                         });
                     } else {
-                        socket.emit('Current Order', currentGroup.currentOrder);
+                        socket.emit('Current Order', currentGroup.getCurrentOrder());
                         currentGroup.acceptNewVote(newVote);
                     }
                 });
@@ -85,7 +82,7 @@ io.on('connection', function (rootSocket) {
                 socket.on('disconnect', function () {
                     currentGroup.userLeft(socket.username);
 
-                    socket.emit('Current Order', currentGroup.currentOrder);
+                    socket.emit('Current Order', currentGroup.getCurrentOrder());
                 });
             });
         }
@@ -111,7 +108,7 @@ io.on('connection', function (rootSocket) {
                        });
                    } else {
                        currentGroup.editOrder(newOrder);
-                       socket.emit('currentOrder', currentGroup.currentOrder);
+                       socket.emit('currentOrder', currentGroup.getCurrentOrder);
                    }
                 });
             });
