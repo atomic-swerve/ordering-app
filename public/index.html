@@ -39,19 +39,16 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Start Bootstrap</a>
+                <a class="navbar-brand" href="#">Group Pizza Order</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a href="#">About</a>
+                        <a href="/">Start New Room</a>
                     </li>
                     <li>
-                        <a href="#">Services</a>
-                    </li>
-                    <li>
-                        <a href="#">Contact</a>
+                        <a href="#join-room" data-toggle="modal">Join Room</a>
                     </li>
                 </ul>
             </div>
@@ -65,10 +62,9 @@
 
         <!-- Jumbotron Header -->
         <header class="jumbotron hero-spacer">
-            <h1>A Warm Welcome!</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa, ipsam, eligendi, in quo sunt possimus non incidunt odit vero aliquid similique quaerat nam nobis illo aspernatur vitae fugiat numquam repellat.</p>
-            <p><a class="btn btn-primary btn-large">Call to action!</a>
-            </p>
+            <h1><span id="group-name">Your</span> Pizza Order</h1>
+            <p>Cast your vote for one of the pizzas below!</p>
+            <p>Share the following ID with your group participants: <span id="order-id">######</span></p>
         </header>
 
         <hr>
@@ -76,7 +72,7 @@
         <!-- Title -->
         <div class="row">
             <div class="col-lg-12">
-                <h3>Latest Features</h3>
+                <h3>Pizza Selections</h3>
             </div>
         </div>
         <!-- /.row -->
@@ -88,11 +84,12 @@
                 <div class="thumbnail">
                     <img src="http://placehold.it/800x500" alt="">
                     <div class="caption">
-                        <h3>Feature Label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                        <h3>Plain Cheese</h3>
+                        <p>Simple and straightforward!</p>
                         <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="#" class="btn btn-default">More Info</a>
+                            <a href="#" id="choice-one-vote" class="btn btn-primary">Cast Vote</a>
                         </p>
+                        <p>Current Votes: <span id="choice-one-count">0</span></p>
                     </div>
                 </div>
             </div>
@@ -101,11 +98,12 @@
                 <div class="thumbnail">
                     <img src="http://placehold.it/800x500" alt="">
                     <div class="caption">
-                        <h3>Feature Label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                        <h3>Meat Lovers</h3>
+                        <p>Sausage, chicken, pepperoni...Yum!</p>
                         <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="#" class="btn btn-default">More Info</a>
+                            <a href="#" id="choice-two-vote" class="btn btn-primary">Cast Vote</a>
                         </p>
+                        <p>Current Votes: <span id="choice-two-count">0</span></p>
                     </div>
                 </div>
             </div>
@@ -114,11 +112,12 @@
                 <div class="thumbnail">
                     <img src="http://placehold.it/800x500" alt="">
                     <div class="caption">
-                        <h3>Feature Label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                        <h3>Veggie</h3>
+                        <p>Tastier than you'd think!</p>
                         <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="#" class="btn btn-default">More Info</a>
+                            <a href="#" id="choice-three-vote" class="btn btn-primary">Cast Vote</a>
                         </p>
+                        <p>Current Votes: <span id="choice-three-count">0</span></p>
                     </div>
                 </div>
             </div>
@@ -127,11 +126,12 @@
                 <div class="thumbnail">
                     <img src="http://placehold.it/800x500" alt="">
                     <div class="caption">
-                        <h3>Feature Label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                        <h3>Hawaiian</h3>
+                        <p>Pineapple totally belongs on a pizza.</p>
                         <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="#" class="btn btn-default">More Info</a>
+                            <a href="#" id="choice-four-vote" class="btn btn-primary">Cast Vote</a>
                         </p>
+                        <p>Current Votes: <span id="choice-four-count">0</span></p>
                     </div>
                 </div>
             </div>
@@ -145,7 +145,7 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Copyright &copy; Your Website 2014</p>
+                    <p>For Pariveda's Tinker Games 2015, Round 2</p>
                 </div>
             </div>
         </footer>
@@ -153,11 +153,49 @@
     </div>
     <!-- /.container -->
 
+    <div id="initial-selection" class="modal fade" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Welcome to the Group Pizza Order app!</h4>
+                </div>
+                <div class="modal-body">
+                    <button type="button" id="create-order" class="btn btn-primary" data-dismiss="modal">Create New Order</button>
+                    <button type="button" class="btn btn-primary" href="#join-room" data-toggle="modal">Join Existing Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="join-room" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Join Order</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon2">Enter order id:</span>
+                        <input type="text" class="form-control" placeholder="######">
+                        <span class="input-group-btn">
+                            <button type="button" id="join-order" class="btn btn-primary">Join</button>
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- jQuery -->
     <script src="js/jquery.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/orders.js"></script>
 
 </body>
 
