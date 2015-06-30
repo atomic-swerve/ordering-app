@@ -18,6 +18,7 @@ $(function(){
 
     socket.on('Group Id', function (groupId) {
         $('#order-id').text(groupId);
+        $('.modal').modal('hide');
         socket.groupId = groupId;
     });
 
