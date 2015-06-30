@@ -1,6 +1,5 @@
-$(document).ready(function(){
-    var socket = new io.Socket();
-    socket.connect('http://localhost:3000');
+$(function(){
+    //var socket = io();
 
     if (window.location.pathname !== "/") { //TODO: better parsing
         //join room id in pathname
@@ -15,28 +14,29 @@ $(document).ready(function(){
 
     $('#choice-one-vote').click(function () {
         socket.emit('New Vote', {
-            user : 'hi',
+            //!todo: do we have a way to determine this?
+            user : 'voter',
             vote : 'Plain Cheese'
         });
     });
 
     $('#choice-two-vote').click(function () {
         socket.emit('New Vote', {
-            user : '',
+            user : 'voter',
             vote : 'Meat Loves'
         });
     });
 
     $('#choice-three-vote').click(function () {
         socket.emit('New Vote', {
-            user : '',
+            user : 'voter',
             vote : 'Veggie'
         });
     });
 
     $('#choice-four-vote').click(function () {
         socket.emit('New Vote', {
-            user : '',
+            user : 'voter',
             vote : 'Hawaiian'
         });
     });
