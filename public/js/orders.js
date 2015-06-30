@@ -4,4 +4,9 @@ $(document).ready(function(){
     } else {
         $("#initial-selection").modal('show');
     }
+
+    //Hook up the create-group message
+    $('#create-order').click(function () {
+        socket.emit('New Group');
+    });
 });
