@@ -12,37 +12,46 @@ $(function(){
         socket.emit('New Group');
     });
 
+    $('#join-order').click(function () {
+        socket.emit('Join Group', $('#join-order-number').val());
+    });
+
+    socket.on('Group Id', function (groupId) {
+        $('#order-id').text(groupId);
+        socket.groupId = groupId;
+    });
+
     $('#choice-one-vote').click(function () {
         socket.emit('New Vote', {
             //!todo: do we have a way to determine this?
-            user : 'voter',
-            vote : 'Plain Cheese'
+            user : socket.id,
+            groupId : socket.groupId,
+            pizza : 'Plain Cheese'
         });
     });
 
     $('#choice-two-vote').click(function () {
         socket.emit('New Vote', {
-            user : 'voter',
-            vote : 'Meat Loves'
+            user : socket.id,
+            groupId : socket.groupId,
+            pizza : 'Meat Lovers'
         });
     });
 
     $('#choice-three-vote').click(function () {
         socket.emit('New Vote', {
-            user : 'voter',
-            vote : 'Veggie'
+            user : socket.id,
+            groupId : socket.groupId,
+            pizza : 'Veggie'
         });
     });
 
     $('#choice-four-vote').click(function () {
         socket.emit('New Vote', {
-            user : 'voter',
-            vote : 'Hawaiian'
+            user : socket.id,
+            groupId : socket.groupId,
+            pizza : 'Hawaiian'
         });
-    });
-
-    socket.on('Group Links', function (links) {
-        $('#order-id').text(links.userUrl);
     });
 
     socket.on('Current Order', function (currentOrder) {
