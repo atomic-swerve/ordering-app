@@ -1,6 +1,7 @@
 var url = require('url');
 var express = require('express');
 var group = require('./lib/group');
+var config = require('./config')
 
 // Setup basic express server
 var app = express();
@@ -38,11 +39,11 @@ io.on('connection', function (rootSocket) {
         });
     });
 
-    var ns = url.parse(rootSocketS.handshake.url, true).query.ns;
+    var ns = url.parse(rootSocket.handshake.url, true).query.ns;
 
     for (var userKey in userRoutes) {
         var userRouteName = userKey;
-        var userRouteRegexp = new Regexp(userRoutes[userKey]);
+        var userRouteRegexp = new RegExp(userRoutes[userKey]);
 
         //!todo: deal with admin string in url
         var currentGroup = groups[userKey];
