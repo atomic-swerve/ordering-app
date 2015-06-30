@@ -47,7 +47,7 @@ io.on('connection', function (socket) {
         if (groups[groupId]) {
             groups[groupId].addUser(socket.id);
             socket.emit('Group Id', groupId);
-            socket.emit('Current Order', groups[groupId].currentOrder)
+            socket.emit('Current Order', groups[groupId].getCurrentOrder());
         }
     });
 
