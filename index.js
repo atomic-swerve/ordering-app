@@ -18,14 +18,16 @@ app.use(express.static(__dirname + '/public'));
 var userRoutes = {};
 var adminRoutes = {};
 
+var groupId = 1;
 var groups = {};
 var currentOrders = {};
 
 io.on('connection', function (rootSocket) {
-    rootSocket.on('New Group', function (name) {
+    rootSocket.on('New Group', function () {
         //Worth noting this will mess up if two groups are present with the same name.
-        var newGroup = group.createGroup(name);
-        groups[name] = newGroup;
+        var newGroup = group.createGroup(groupId);
+        groups[groupId] = newGroup;
+        groupId++;
 
         userRoutes[name] = '^\\/' + newGroup.userUrl + '\\/(\\d+)$';
         //Admins should also have all user functionality

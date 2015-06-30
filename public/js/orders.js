@@ -1,5 +1,6 @@
 $(document).ready(function(){
-    var groupId = 1;
+    var socket = new io.Socket();
+    socket.connect('http://localhost:3000');
 
     if (window.location.pathname !== "/") { //TODO: better parsing
         //join room id in pathname
@@ -9,9 +10,7 @@ $(document).ready(function(){
 
     //Hook up the create-group message
     $('#create-order').click(function () {
-        $('#order-id').text(groupId);
-        socket.emit('New Group', groupId);
-        groupId++;
+        socket.emit('New Group');
     });
 
     $('#choice-one-vote').click(function () {
@@ -46,5 +45,26 @@ $(document).ready(function(){
         $('#order-id').text(links.userUrl);
     });
 
+    socket.on('Current Order', function (currentOrder) {
+        var choiceOneVotes = 0;
+        var choiceTwoVotes = 0;
+        var choiceThreeVotes = 0;
+        var choiceFourVotes = 0;
 
+        for (var choice in currentOrder.votes) {
+            if (choice !== 'noVotes' && choice !== 'voting') {
+                switch (choice) {
+                    case 'Plain Cheese': choiceOneVotes += currentOrder.votes[choice].length; break;
+                    case 'Meat Lovers': choiceTwoVotes += currentOrder.votes[choice].length; break;
+                    case 'Veggie': choiceThreeVotes += currentOrder.votes[choice].length; break;
+                    case 'Hawaiian': choiceFourVotes += currentOrder.votes[choice].length; break;
+                }
+            }
+        }
+
+        $('#choice-one-count').text(choiceOneVotes);
+        $('#choice-two-count').text(choiceTwoVotes);
+        $('#choice-three-count').text(choiceThreeVotes);
+        $('#choice-four-count').text(choiceFourVotes);
+    });
 });
